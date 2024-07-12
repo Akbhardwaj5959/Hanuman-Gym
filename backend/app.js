@@ -8,33 +8,33 @@ const router = express.Router();
 
 config({ path: "./config.env" });
 
+const corsOptions = {
+  origin: [process.env.FRONTEND_URL],
+  methods: ["GET", "POST"],
+  credentials: true,
+};
 
-app.use(
-  cors({
-    origin: [process.env.FRONTEND_URL],
-    methods: ["POST"],
-    credentials: true,
-  })
-);
-
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-router.get("/", async (req, res) => { req.json({message: "Hellow World"}) };
+router.get("/", (req, res) => {
+  res.json({ message: "Hello World" });
+});
 
 router.post("/send/mail", async (req, res, next) => {
   const { name, email, message } = req.body;
+
   if (!name || !email || !message) {
-    return next(
-      res.status(400).json({
-        success: false,
-        message: "Please provide all details",
-      })
-    );
+    return res.status(400).json({
+      success: false,
+      message: "Please provide all details",
+    });
   }
+
   try {
     await sendEmail({
-      email: "riyajay31@gmai.com",
+      email: "riyajay31@gmail.com",
       subject: "GYM WEBSITE CONTACT",
       message,
       userEmail: email,
@@ -46,13 +46,14 @@ router.post("/send/mail", async (req, res, next) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: " Internal Server Error",
+      message: "Internal Server Error",
     });
   }
 });
 
 app.use(router);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server listening at port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server listening at port ${PORT}`);
 });
