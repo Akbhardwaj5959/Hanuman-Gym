@@ -20,6 +20,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+router.get("/", async (req, res) => { req.json({message: "Hellow World"}) };
 
 router.post("/send/mail", async (req, res, next) => {
   const { name, email, message } = req.body;
