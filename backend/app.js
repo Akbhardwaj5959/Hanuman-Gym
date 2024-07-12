@@ -4,26 +4,25 @@ import cors from "cors";
 import { sendEmail } from "./utils/sendEmail.js";
 
 const app = express();
-const router = express.Router();
 
 config({ path: "./config.env" });
 
 const corsOptions = {
-  origin: [process.env.FRONTEND_URL],
+  origin: process.env.FRONTEND_URL,  // No need to wrap in an array
   methods: ["GET", "POST"],
   credentials: true,
 };
 
-app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-router.get("/", (req, res) => {
+app.get("/", (req, res) => {
   res.json({ message: "Hello World" });
 });
 
-router.post("/send/mail", async (req, res, next) => {
+app.post("/send/mail", async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message) {
@@ -45,6 +44,7 @@ router.post("/send/mail", async (req, res, next) => {
       message: "Message Sent Successfully.",
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -52,9 +52,9 @@ router.post("/send/mail", async (req, res, next) => {
   }
 });
 
-app.use(router);
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}`);
 });
+
+export default app;
