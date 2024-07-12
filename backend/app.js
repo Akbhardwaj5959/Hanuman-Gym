@@ -4,11 +4,12 @@ import cors from "cors";
 import { sendEmail } from "./utils/sendEmail.js";
 
 const app = express();
+const router = express.Router();
 
 config({ path: "./config.env" });
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,  // No need to wrap in an array
+  origin: true, // Allow all origins
   methods: ["GET", "POST"],
   credentials: true,
 };
@@ -18,11 +19,11 @@ app.options('*', cors(corsOptions)); // Handle preflight requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
+router.get("/", (req, res) => {
   res.json({ message: "Hello World" });
 });
 
-app.post("/send/mail", async (req, res) => {
+router.post("/send/mail", async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message) {
@@ -51,6 +52,8 @@ app.post("/send/mail", async (req, res) => {
     });
   }
 });
+
+app.use(router);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
